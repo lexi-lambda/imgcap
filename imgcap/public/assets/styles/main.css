@@ -58,3 +58,7 @@ body {
 .album--image, .album--description {
   margin-bottom: 2px;
 }
+
+.album--image:last-of-type, .album--description:last-of-type {
+  margin-bottom: 0;
+}
