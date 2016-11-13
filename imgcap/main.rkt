@@ -10,6 +10,7 @@
          web-server/dispatch
          web-server/http/xexpr
          web-server/servlet-env
+         "lib/response.rkt"
          "lib/sanitize.rkt"
          "lib/xexpr.rkt")
 
@@ -43,20 +44,17 @@
                       (div [[class "image-description"]]
                            ,(let ([description (json-null-or (hash-ref image 'description) "")])
                               (map process-xexpr (sanitize-markdown description))))))))
-    (response/xexpr
-     #:preamble #"<!DOCTYPE html>"
-     `(html
-       (head (title ,(~a (if title (~a title " | ") "")
-                         "imgcap"))
-             (meta [[name "viewport"]
-                    [content "width=device-width, initial-scale=1"]])
-             (link [[rel "stylesheet"] [href "/assets/styles/main.css"]])
-             (script [[src "https://code.jquery.com/jquery-3.1.1.slim.min.js"]])
-             (script [[src "/assets/scripts/album.js"]]))
-       (body
-        (div [[class "album"]]
-             (div [[class "album--images"]] ,@images)
-             (div [[class "album--descriptions"]] ,@descriptions)))))))
+    (response/page
+     #:title title
+     #:head `[(meta [[name "viewport"]
+                     [content ,(~a "width=device-width, initial-scale=1, "
+                                   "maximum-scale=1, user-scalable=no")]])
+              (link [[rel "stylesheet"] [href "/assets/styles/main.css"]])
+              (script [[src "https://code.jquery.com/jquery-3.1.1.slim.min.js"]])
+              (script [[src "/assets/scripts/album.js"]])]
+     `(div [[class "album"]]
+           (div [[class "album--images"]] ,@images)
+           (div [[class "album--descriptions"]] ,@descriptions)))))
 
 (define-values [server-dispatch server-url]
   (dispatch-rules
