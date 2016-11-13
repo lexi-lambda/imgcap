@@ -28,7 +28,7 @@
     (match response
       [(hash-table ['status 200] ['data album] [_ _] ...)
        album]
-      [(hash-table ['status 404] [_ _] ...)
+      [(hash-table ['status (or 400 404)] [_ _] ...)
        #f])))
 
 (define (json-null-or val default)
