@@ -48,6 +48,7 @@ body {
   display: inline-block;
   text-align: justify;
   line-height: 1.35em;
+  width: 100%;
 }
 
 .image-description {
