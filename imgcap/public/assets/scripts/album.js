@@ -7,8 +7,9 @@ var scheduledLayoutUpdate = null;
 // synchronize the scroll positions of both columns while keeping as much
 // content from the “current” position on screen at a time.
 function updateLayout() {
+  var viewportHeight = $(window).height()
     // the elements of each column
-  var $images = $('.album--image')
+    , $images = $('.album--image')
     , $descriptions = $('.album--description')
     // the current browser scroll position
     , currentScroll = $(window).scrollTop() // Math.max(0, $(window).scrollTop())
@@ -65,8 +66,7 @@ function updateLayout() {
     // adjust the opacity of the shades based on how far away they are from
     // becoming the current row
     (function () {
-      var viewportHeight = $(window).height()
-        , shadeLimit = viewportHeight * 0.25
+      var shadeLimit = viewportHeight * 0.25
         , shadeDuration = viewportHeight
         , opacity = (accPageHeight - currentScroll - shadeLimit) / shadeDuration
         , clampedOpacity = Math.max(0, Math.min(opacity, 0.35));
@@ -80,7 +80,13 @@ function updateLayout() {
   // actually apply the resulting layout information to the page
   if (scheduledLayoutUpdate) { window.cancelAnimationFrame(scheduledLayoutUpdate); }
   scheduledLayoutUpdate = window.requestAnimationFrame(function () {
-    $('body').css('height', accPageHeight);
+    // add a bit of padding to the end of the page so that the user can scroll
+    // the final row to the top of the viewport, but no further
+    var imageHeight = $images.last().outerHeight(true)
+      , descriptionHeight = $descriptions.last().outerHeight(true)
+      , biggestHeight = Math.max(imageHeight, descriptionHeight)
+      , pagePadding = Math.max(0, viewportHeight - biggestHeight);
+    $('body').css('height', accPageHeight + pagePadding);
     $('.album--images').css('top', -accImageOffset);
     $('.album--descriptions').css('top', -accDescriptionOffset);
   });
