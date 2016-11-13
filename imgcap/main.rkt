@@ -4,6 +4,7 @@
 
          json
          net/url
+         racket/format
          racket/list
          racket/runtime-path
          web-server/dispatch
@@ -23,12 +24,18 @@
               imgur-headers))
             'data))
 
+(define (json-null-or val default)
+  (if (eq? (json-null) val) default val))
+
 (define (show-album req album-id)
-  (let ([album (imgur-get-album album-id)])
+  (let* ([album (imgur-get-album album-id)]
+         [title (json-null-or (hash-ref album 'title) #f)])
     (response/xexpr
      #:preamble #"<!DOCTYPE html>"
      `(html
-       (head (link [[rel "stylesheet"] [href "/assets/styles/main.css"]]))
+       (head (title ,(~a (if title (~a title " | ") "")
+                         "imgcap"))
+             (link [[rel "stylesheet"] [href "/assets/styles/main.css"]]))
        (body
         (div [[class "album"]]
              ,@(for/list ([image (in-list (hash-ref album 'images))])
@@ -37,10 +44,8 @@
                             (img [[src ,(hash-ref image 'link)]]))
                        (div [[class "album--image_description"]]
                             (div [[class "image-description"]]
-                                 ,(let ([description (hash-ref image 'description)])
-                                    (if (eq? 'null description) ""
-                                        (map process-xexpr
-                                             (sanitize-markdown description))))))))))))))
+                                 ,(let ([description (json-null-or (hash-ref image 'description) "")])
+                                    (map process-xexpr (sanitize-markdown description)))))))))))))
 
 (define-values [server-dispatch server-url]
   (dispatch-rules
