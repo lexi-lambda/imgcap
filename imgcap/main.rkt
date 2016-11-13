@@ -36,8 +36,10 @@
         (values `(div [[class "album--image"]
                        [width ,(~a (hash-ref image 'width))]
                        [height ,(~a (hash-ref image 'height))]]
+                      (div [[class "album--shade"]])
                       (img [[src ,(hash-ref image 'link)]]))
                 `(div [[class "album--description"]]
+                      (div [[class "album--shade"]])
                       (div [[class "image-description"]]
                            ,(let ([description (json-null-or (hash-ref image 'description) "")])
                               (map process-xexpr (sanitize-markdown description))))))))

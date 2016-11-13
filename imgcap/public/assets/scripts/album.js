@@ -26,6 +26,8 @@ function updateLayout() {
       // the current element from each column for the row we’re looking at
     var $image = $(this)
       , $description = $descriptions.eq(i)
+      , $shades = $image.find('.album--shade')
+                    .add($description.find('.album--shade'))
       // the height of each element, including the margin
       , imageHeight = $image.outerHeight(true)
       , descriptionHeight = $description.outerHeight(true)
@@ -59,6 +61,17 @@ function updateLayout() {
         accDescriptionOffset += descriptionHeight;
       }
     }
+
+    // adjust the opacity of the shades based on how far away they are from
+    // becoming the current row
+    (function () {
+      var viewportHeight = $(window).height()
+        , shadeLimit = viewportHeight * 0.25
+        , shadeDuration = viewportHeight
+        , opacity = (accPageHeight - currentScroll - shadeLimit) / shadeDuration
+        , clampedOpacity = Math.max(0, Math.min(opacity, 0.35));
+      $shades.css('opacity', clampedOpacity);
+    })();
 
     // the total page height is the sum of all the largest element heights
     accPageHeight += biggestHeight;

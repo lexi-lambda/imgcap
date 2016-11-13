@@ -25,9 +25,12 @@ body {
   width: 100%;
 }
 
+.album--images, .album--image, .album--descriptions, .album--description {
+  position: relative;
+}
+
 .album--images {
   flex: 1;
-  position: relative;
 }
 
 .album--image img {
@@ -40,7 +43,6 @@ body {
 .album--descriptions {
   flex: 0 0 540px;
   margin-left: 2px;
-  position: relative;
 }
 
 .album--description {
@@ -61,4 +63,13 @@ body {
 
 .album--image:last-of-type, .album--description:last-of-type {
   margin-bottom: 0;
+}
+
+.album--shade {
+  background-color: black;
+  height: 100%;
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
 }
