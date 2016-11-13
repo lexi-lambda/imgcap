@@ -20,33 +20,40 @@ body {
 }
 
 .album {
+  display: flex;
+  position: fixed;
   width: 100%;
 }
 
-.album--image {
-  display: flex;
-  margin-bottom: 2px;
-}
-
-.album--image_image {
+.album--images {
   flex: 1;
+  position: relative;
 }
 
-.album--image_image img {
+.album--image img {
   display: block;
   margin: 0 auto;
   max-height: 100vh;
   max-width: 100%;
 }
 
-.album--image_description {
-  background-color: #FAFAFA;
+.album--descriptions {
   flex: 0 0 540px;
   margin-left: 2px;
+  position: relative;
+}
+
+.album--description {
+  background-color: #FAFAFA;
+  display: inline-block;
   text-align: justify;
   line-height: 1.35em;
 }
 
 .image-description {
   margin: 30px;
+}
+
+.album--image, .album--description {
+  margin-bottom: 2px;
 }
