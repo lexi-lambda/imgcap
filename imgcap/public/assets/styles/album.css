@@ -1,0 +1,82 @@
+.album {
+  display: flex;
+  position: fixed;
+  width: 100%;
+}
+
+.album--images, .album--image, .album--descriptions, .album--description {
+  position: relative;
+}
+
+.album--images {
+  flex: 1;
+}
+
+.album--image img {
+  display: block;
+  margin: 0 auto;
+  max-height: 100vh;
+  max-width: 100%;
+}
+
+.album--descriptions {
+  flex: 0 0 200px;
+  margin-left: 2px;
+}
+
+.album--description {
+  background-color: #FAFAFA;
+  display: inline-block;
+  text-align: justify;
+  line-height: 1.35em;
+  width: 100%;
+}
+
+.image-description {
+  margin: 20px;
+}
+
+.album--image, .album--description {
+  margin-bottom: 2px;
+}
+
+.album--image:last-of-type, .album--description:last-of-type {
+  margin-bottom: 0;
+}
+
+.album--shade {
+  background-color: black;
+  height: 100%;
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+@media (min-width: 650px) {
+  body {
+    font-size: 14px;
+  }
+
+  .image-description {
+    margin: 25px;
+  }
+
+  .album--descriptions {
+    flex-basis: 350px;
+  }
+}
+
+@media (min-width: 1000px) {
+  body {
+    font-size: 18px;
+  }
+
+  .image-description {
+    margin: 30px;
+  }
+
+  .album--descriptions {
+    flex-basis: 540px;
+  }
+}

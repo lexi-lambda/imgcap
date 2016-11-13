@@ -6,6 +6,7 @@
          net/url
          racket/format
          racket/list
+         racket/match
          racket/runtime-path
          web-server/dispatch
          web-server/http/xexpr
@@ -19,45 +20,59 @@
         "Accept: application/json"))
 
 (define (imgur-get-album album-id)
-  (hash-ref (read-json
-             (get-pure-port
-              (string->url (format "https://api.imgur.com/3/album/~a" album-id))
-              imgur-headers))
-            'data))
+  (let ([response (read-json
+                   (get-pure-port
+                    (string->url (format "https://api.imgur.com/3/album/~a" album-id))
+                    imgur-headers))])
+    (match response
+      [(hash-table ['status 200] ['data album] [_ _] ...)
+       album]
+      [(hash-table ['status 404] [_ _] ...)
+       #f])))
 
 (define (json-null-or val default)
   (if (eq? (json-null) val) default val))
 
 (define (show-album req album-id)
-  (let* ([album (imgur-get-album album-id)]
-         [title (json-null-or (hash-ref album 'title) #f)])
-    (define-values [images descriptions]
-      (for/lists [images descriptions]
-                 ([image (in-list (hash-ref album 'images))])
-        (values `(div [[class "album--image"]
-                       [width ,(~a (hash-ref image 'width))]
-                       [height ,(~a (hash-ref image 'height))]]
-                      (div [[class "album--shade"]])
-                      (img [[src ,(hash-ref image 'link)]]))
-                `(div [[class "album--description"]]
-                      (div [[class "album--shade"]])
-                      (div [[class "image-description"]]
-                           ,(let ([description (json-null-or (hash-ref image 'description) "")])
-                              (map process-xexpr (sanitize-markdown description))))))))
-    (response/page
-     #:title title
-     #:head `[(meta [[name "viewport"]
-                     [content ,(~a "width=device-width, initial-scale=1, "
-                                   "maximum-scale=1, user-scalable=no")]])
-              (link [[rel "stylesheet"] [href "/assets/styles/main.css"]])
-              (script [[src "https://code.jquery.com/jquery-3.1.1.slim.min.js"]])
-              (script [[src "/assets/scripts/album.js"]])]
-     `(div [[class "album"]]
-           (div [[class "album--images"]] ,@images)
-           (div [[class "album--descriptions"]] ,@descriptions)))))
+  (let ([album (imgur-get-album album-id)])
+    (cond
+      [album
+       (define-values [images descriptions]
+         (for/lists [images descriptions]
+           ([image (in-list (hash-ref album 'images))])
+           (values `(div [[class "album--image"]
+                          [width ,(~a (hash-ref image 'width))]
+                          [height ,(~a (hash-ref image 'height))]]
+                         (div [[class "album--shade"]])
+                         (img [[src ,(hash-ref image 'link)]]))
+                   `(div [[class "album--description"]]
+                         (div [[class "album--shade"]])
+                         (div [[class "image-description"]]
+                              ,(let ([description (json-null-or (hash-ref image 'description) "")])
+                                 (map process-xexpr (sanitize-markdown description))))))))
+       (response/page
+        #:title (json-null-or (hash-ref album 'title) #f)
+        #:head `[(meta [[name "viewport"]
+                        [content ,(~a "width=device-width, initial-scale=1, "
+                                      "maximum-scale=1, user-scalable=no")]])
+                 (link [[rel "stylesheet"] [href "/assets/styles/album.css"]])
+                 (script [[src "https://code.jquery.com/jquery-3.1.1.slim.min.js"]])
+                 (script [[src "/assets/scripts/album.js"]])]
+        `(div [[class "album"]]
+              (div [[class "album--images"]] ,@images)
+              (div [[class "album--descriptions"]] ,@descriptions)))]
+      [else (not-found req #:title "Album Not Found")])))
+
+(define (not-found req #:title [title "Not Found"])
+  (response/page
+   #:code 404
+   #:message "Not Found"
+   #:title title
+   `(div (h1 ,title))))
 
 (define-values [server-dispatch server-url]
   (dispatch-rules
+   [("") not-found]
    [("album" (string-arg)) show-album]))
 
 ;; ---------------------------------------------------------------------------------------------------
@@ -69,4 +84,5 @@
                #:launch-browser? #f
                #:listen-ip #f
                #:servlet-regexp #rx""
-               #:extra-files-paths (list public-path))
+               #:extra-files-paths (list public-path)
+               #:file-not-found-responder not-found)

@@ -11,7 +11,9 @@
  (contract-out
   [response/page ([xexpr?]
                   [#:title (or/c string? #f)
-                   #:head (listof xexpr?)]
+                   #:head (listof xexpr?)
+                   #:code (integer-in 100 599)
+                   #:message string?]
                   . ->* . response?)]))
 
 (define google-analytics-js #<<JS
@@ -28,10 +30,15 @@ JS
 
 (define (response/page xexpr
                        #:title [title #f]
-                       #:head [head '()])
+                       #:head [head '()]
+                       #:code [code 200]
+                       #:message [message "OK"])
   (response/xexpr
+   #:code code
+   #:message (string->bytes/utf-8 message)
    #:preamble #"<!DOCTYPE html>"
    `(html (head (title ,(if title (~a title " | imgcap") "imgcap"))
+                (link [[rel "stylesheet"] [href "/assets/styles/main.css"]])
                 ,@head
                 ,@(if env:google-analytics-tracking-id
                       `((script ,(format google-analytics-js env:google-analytics-tracking-id)))
