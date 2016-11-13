@@ -5,14 +5,15 @@
          json
          net/url
          racket/format
-         racket/list
          racket/match
          racket/runtime-path
          web-server/dispatch
-         web-server/http/xexpr
+         web-server/http/redirect
+         web-server/http/request-structs
          web-server/servlet-env
          "lib/response.rkt"
          "lib/sanitize.rkt"
+         "lib/util.rkt"
          "lib/xexpr.rkt")
 
 (define imgur-headers
@@ -32,6 +33,22 @@
 
 (define (json-null-or val default)
   (if (eq? (json-null) val) default val))
+
+(define (index req)
+  (response/page
+   #:title "Home"
+   #:head `[(link [[rel "stylesheet"] [href "/assets/styles/index.css"]])]
+   `(div [[class "page-index"]]
+         (h1 "imgcap")
+         (form [[method "post"] [action ,(server-url goto-album)]]
+               (label [[for "album-id"]] "imgur album id: ")
+               (input [[type "text"] [id "album-id"] [name "album-id"]])
+               (button [[type "submit"]] "Go")))))
+
+(define (goto-album req)
+  (match (request-bindings/raw req)
+    [(form-bindings [#"album-id" album-id])
+     (redirect-to (server-url show-album album-id))]))
 
 (define (show-album req album-id)
   (let ([album (imgur-get-album album-id)])
@@ -72,7 +89,8 @@
 
 (define-values [server-dispatch server-url]
   (dispatch-rules
-   [("") not-found]
+   [("") index]
+   [("goto-album") #:method "post" goto-album]
    [("album" (string-arg)) show-album]))
 
 ;; ---------------------------------------------------------------------------------------------------

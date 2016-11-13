@@ -54,10 +54,6 @@
 }
 
 @media (min-width: 650px) {
-  body {
-    font-size: 14px;
-  }
-
   .image-description {
     margin: 25px;
   }
@@ -68,10 +64,6 @@
 }
 
 @media (min-width: 1000px) {
-  body {
-    font-size: 18px;
-  }
-
   .image-description {
     margin: 30px;
   }
