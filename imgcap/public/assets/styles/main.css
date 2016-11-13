@@ -11,7 +11,7 @@ body {
   background-color: #303030;
   color: #2A2A2A;
   font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, sans-serif, 'Apple Color Emoji';
-  font-size: 18px;
+  font-size: 12px;
   width: 100%;
 }
 
@@ -41,7 +41,7 @@ body {
 }
 
 .album--descriptions {
-  flex: 0 0 540px;
+  flex: 0 0 200px;
   margin-left: 2px;
 }
 
@@ -54,7 +54,7 @@ body {
 }
 
 .image-description {
-  margin: 30px;
+  margin: 20px;
 }
 
 .album--image, .album--description {
@@ -72,4 +72,32 @@ body {
   pointer-events: none;
   position: absolute;
   width: 100%;
+}
+
+@media (min-width: 650px) {
+  body {
+    font-size: 14px;
+  }
+
+  .image-description {
+    margin: 25px;
+  }
+
+  .album--descriptions {
+    flex-basis: 350px;
+  }
+}
+
+@media (min-width: 1000px) {
+  body {
+    font-size: 18px;
+  }
+
+  .image-description {
+    margin: 30px;
+  }
+
+  .album--descriptions {
+    flex-basis: 540px;
+  }
 }

@@ -48,6 +48,8 @@
      `(html
        (head (title ,(~a (if title (~a title " | ") "")
                          "imgcap"))
+             (meta [[name "viewport"]
+                    [content "width=device-width, initial-scale=1"]])
              (link [[rel "stylesheet"] [href "/assets/styles/main.css"]])
              (script [[src "https://code.jquery.com/jquery-3.1.1.slim.min.js"]])
              (script [[src "/assets/scripts/album.js"]]))
