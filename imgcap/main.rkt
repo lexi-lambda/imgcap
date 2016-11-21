@@ -2,6 +2,7 @@
 
 (require (prefix-in env: "environment.rkt")
 
+         data/maybe
          json
          net/url
          racket/format
@@ -41,14 +42,20 @@
    `(div [[class "page-index"]]
          (h1 "imgcap")
          (form [[method "post"] [action ,(server-url goto-album)]]
-               (label [[for "album-id"]] "imgur album id: ")
-               (input [[type "text"] [id "album-id"] [name "album-id"] [placeholder " "]])
+               (label [[for "album-id"]] "imgur album id or URL: ")
+               (input [[type "text"] [id "album-id"] [name "album-ref"] [placeholder " "]])
                (button [[type "submit"]] "Go")))))
 
 (define (goto-album req)
   (match (request-bindings/raw req)
-    [(form-bindings [#"album-id" album-id])
-     (redirect-to (server-url show-album album-id))]))
+    [(form-bindings [#"album-ref" album-ref])
+     (match (exn->maybe url-exception? string->url album-ref)
+       [(just {struct* url ([host {or "imgur.com" "www.imgur.com"}]
+                            [path (list (path/param "a" '())
+                                        (path/param album-id '()))])})
+        (redirect-to (server-url show-album album-id))]
+       [_
+        (redirect-to (server-url show-album album-ref))])]))
 
 (define (show-album req album-id)
   (let ([album (imgur-get-album album-id)])
