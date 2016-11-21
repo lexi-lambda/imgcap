@@ -42,7 +42,7 @@
          (h1 "imgcap")
          (form [[method "post"] [action ,(server-url goto-album)]]
                (label [[for "album-id"]] "imgur album id: ")
-               (input [[type "text"] [id "album-id"] [name "album-id"]])
+               (input [[type "text"] [id "album-id"] [name "album-id"] [placeholder " "]])
                (button [[type "submit"]] "Go")))))
 
 (define (goto-album req)
